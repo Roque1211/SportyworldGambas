@@ -1,0 +1,91 @@
+' Gambas class file
+
+
+'Estado
+'Colección con los tipos de ejercicios disponibles
+Private TEColeccion As TiposEjercicios
+
+'Fichero con los datos
+Private Const FILE_DATOS As String = "tiposejercicios.txt"
+
+
+'Comportamiento
+'Constructor
+Public Sub _new()
+  
+  TEColeccion = New TiposEjercicios
+  
+  
+End
+
+
+'comportamiento para devolver las KCAL de una determinada actividad
+'realizada
+Public Function calcularKCal(minutos As Integer, kilos As Float, descrEjer As String) As String
+  
+  Dim resultado As String
+  Dim miEjercicio As Ejercicio
+  
+  
+  'dado los kg, minutos y el ejercicio seleccionado, creamos los objetos necesarios
+  miEjercicio = TEColeccion.getEjercicioByDescr(descrEjer)
+  
+  'y después a esos objetos les pedimos trabajar
+  resultado = miEjercicio.calcularKCal(minutos, kilos)
+  
+  
+  'el resultado del trabajo lo ponemos en la pantalla, concretamente en el LBResultado
+  Return resultado
+End
+
+
+
+'Tenemos que inicializar el ComboBox con todos los tipos de ejercicios
+'disponibles
+Public Sub iniComboBox(CBEjer As ComboBox)
+
+  Dim i As Integer
+
+  Dim miCadena As String
+  Dim miEjercicio As Ejercicio
+  
+  cargarDatos()
+  
+  For i = 0 To TEColeccion.getSize() - 1
+    miEjercicio = TEColeccion.getEjercicioByIndex(i)    
+    miCadena = miEjercicio.getDescripcion()  
+    CBEjer.Add(miCadena)
+  Next 
+  
+  CBEjer.Index = 0
+  
+End
+
+
+'cargar los datos en la coleccion
+
+Private Sub cargarDatos()
+    
+Dim hFile As File
+Dim sLine As String
+Dim miEjercicio As Ejercicio    
+' abro el fichero
+hFile = Open FILE_DATOS For Input
+    
+While Not Eof(hFile)
+  Line Input #hFile, sLine
+  'Añadimos deserializando en el constructor el string obtenido del fichero
+  miEjercicio = New Ejercicio(sLine)
+  TEColeccion.addEjercicio(miEjercicio)
+Wend
+
+hFile.Close()
+  
+End
+
+
+
+
+
+
+

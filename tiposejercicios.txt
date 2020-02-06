@@ -1,0 +1,3 @@
+Caminata;4.3
+Correr;7.0
+Bicicleta;7.5
