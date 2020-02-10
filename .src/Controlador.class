@@ -69,23 +69,67 @@ Private Sub cargarDatos()
 Dim hFile As File
 Dim sLine As String
 Dim miEjercicio As Ejercicio    
-' abro el fichero
-hFile = Open FILE_DATOS For Input
-    
-While Not Eof(hFile)
-  Line Input #hFile, sLine
-  'Añadimos deserializando en el constructor el string obtenido del fichero
-  miEjercicio = New Ejercicio(sLine)
-  TEColeccion.addEjercicio(miEjercicio)
-Wend
+Dim errores As String
+Dim contador As Integer = 1
 
-hFile.Close()
+
+If (Exist(FILE_DATOS)) Then
+  ' abro el fichero
+  hFile = Open FILE_DATOS For Input
+      
+  While Not Eof(hFile)
+    errores = ""
+    
+    'leer la siguiente linea
+    Line Input #hFile, sLine
+    'Comprobar que la linea es correcta
+    errores = comprobarErrores(sLine)
+    If (errores <> "") Then
+      Message.Error(errores & " en la linea " & contador & " del fichero " & FILE_DATOS & ".", "Aceptar")
+      FMain.Close
+    Else
+      'Añadimos deserializando en el constructor el string obtenido del fichero
+      miEjercicio = New Ejercicio(sLine)
+      TEColeccion.addEjercicio(miEjercicio)
+    Endif
+    contador = contador + 1
+  Wend
   
+  hFile.Close()
+Else
+    Message.Error("Fichero " & FILE_DATOS & " no encontrado.", "Aceptar")
+    FMain.Close()
+Endif  
 End
 
-
-
-
-
-
+' Comprobador de errores
+Private Function comprobarErrores(entrada As String) As String
+  Dim resultado As String
+  Dim campo2 As String
+  Dim primerseparador As Integer
+  
+  primerseparador = InStr(entrada, ";")
+  
+  resultado = ""
+  'linea vacia
+  If (entrada.Len = 0) Then
+    resultado = "Línea vacia"
+  Else 
+    If (primerseparador > 1) Then
+      If (InStr(entrada, ";", primerseparador + 1) > 0) Then
+          resultado = "Hay más de dos columnas"
+      Else
+          'voy bien, no tengo cadena vacia ni ; al principio, ni varios ni ningún ;
+          campo2 = Right(entrada, Len(entrada) - primerseparador)
+          If Not IsFloat(campo2) Then resultado = "El segundo campo no es del tipo decimal"
+      Endif
+    Else
+      resultado = "Tenemos un ; al principio o tenemos una sola columna"
+    Endif
+  Endif
+  
+  'la segunda columna no es un número
+  
+  Return resultado
+End
 
