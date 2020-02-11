@@ -1,9 +1,12 @@
 Manzanas;3.2
-
 Caminata;4.3
 Correr;7.0
 Bicicleta;7.5
-Pimiento,2.4
-calabaza;2.5;nones
-;4.5
-tomate;tomate
+Pimiento;2.4
+calabaza;2.5
+pepito;4.5
+
+tomate;6.5
+;
+tomate2;tomate2
+patata1;3.2;4.5

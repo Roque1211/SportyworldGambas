@@ -72,6 +72,12 @@ Dim miEjercicio As Ejercicio
 Dim errores As String
 Dim contador As Integer = 1
 
+Dim hayError As Boolean
+Dim filError As File
+Dim totalError As String
+
+hayError = False
+totalError = Now & " \n"
 
 If (Exist(FILE_DATOS)) Then
   ' abro el fichero
@@ -86,7 +92,8 @@ If (Exist(FILE_DATOS)) Then
     errores = comprobarErrores(sLine)
     If (errores <> "") Then
       Message.Error(errores & " en la linea " & contador & " del fichero " & FILE_DATOS & ".", "Aceptar")
-      FMain.Close
+      hayError = True
+      totalError = totalError & errores & " en la linea " & contador & " del fichero " & FILE_DATOS & ".\n"
     Else
       'Añadimos deserializando en el constructor el string obtenido del fichero
       miEjercicio = New Ejercicio(sLine)
@@ -98,8 +105,20 @@ If (Exist(FILE_DATOS)) Then
   hFile.Close()
 Else
     Message.Error("Fichero " & FILE_DATOS & " no encontrado.", "Aceptar")
-    FMain.Close()
+    hayError = True
+    totalError = totalError & "Fichero " & FILE_DATOS & " no encontrado. \n"
 Endif  
+
+If hayError Then 
+  'escribimos log
+  totalError = totalError & "\n ----------------------------------------------------------------- \n \n"
+  totalError = totalError & File.Load(User.home & "/Descargas/log.txt")
+  File.save(User.home & "/Descargas/log.txt", totalError)
+
+  'salimos
+  FMain.Close
+Endif  
+
 End
 
 ' Comprobador de errores
@@ -121,7 +140,8 @@ Private Function comprobarErrores(entrada As String) As String
       Else
           'voy bien, no tengo cadena vacia ni ; al principio, ni varios ni ningún ;
           campo2 = Right(entrada, Len(entrada) - primerseparador)
-          If Not IsFloat(campo2) Then resultado = "El segundo campo no es del tipo decimal"
+          Try CFloat(campo2) 
+          If Error Then resultado = "El segundo campo no es de tipo decimal"
       Endif
     Else
       resultado = "Tenemos un ; al principio o tenemos una sola columna"
