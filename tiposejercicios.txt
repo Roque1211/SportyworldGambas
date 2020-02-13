@@ -10,3 +10,4 @@ tomate;6.5
 ;
 tomate2;tomate2
 patata1;3.2;4.5
+fresas;9.5
